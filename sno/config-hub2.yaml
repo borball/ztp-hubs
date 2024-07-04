@@ -1,0 +1,75 @@
+cluster:
+  domain: outbound.vz.bos2.lab
+  name: hub2
+  capabilities:
+    #None|vCurrent|v4.12|v4.14 ...
+    baselineCapabilitySet: v4.15
+
+host:
+  interface: ens1f0
+  hostname: hub2.outbound.vz.bos2.lab
+  mac: de:ad:be:ff:10:75
+  ipv4:
+    enabled: true
+    dhcp: false
+    ip: 192.168.58.75
+    dns:
+      - 192.168.58.15
+    gateway: 192.168.58.1
+    prefix: 25
+    machine_network_cidr: 192.168.58.0/25
+  disk: /dev/vda
+
+day1:
+  workload_partition: false
+  kdump:
+    enabled: false
+    #set blacklist_ice as true on HPE servers
+    blacklist_ice: false
+  boot_accelerate: false
+  crun: true
+  #4.14, https://issues.redhat.com/browse/OCPBUGS-17660
+  rcu_normal: false
+  #4.14, reduce a node boot and fix a race condition issue in sriov operator
+  sriov_kernel: false
+  #4.14, sync the node time from ntp when node reboot and ptp got involved
+  sync_time_once: false
+  #ztp_hub=true will enable rhacm/lvm/gitops/talm on the cluster
+  ztp_hub: true
+  operators:
+    ptp:
+      enabled: false
+    sriov:
+      enabled: false
+    local-storage:
+      enabled: false
+
+cpu:
+  isolated: 16-47
+  reserved: 0-15
+
+proxy:
+  enabled: false
+  http:
+  https:
+  noproxy:
+
+pull_secret: /root/pull-secret.json
+ssh_key: /root/.ssh/id_rsa.pub
+container_registry:
+  #image_source: /root/registry/local-mirror.yaml
+  #prega: true
+  disable_catalogsources:
+    - redhat-marketplace
+    - community-operators
+    #- certified-operators
+    #- redhat-operators
+
+bmc:
+  address: 192.168.58.15:8080
+  username: Administrator
+  password: dummy
+  kvm_uuid: 11111111-1111-1111-9999-000000000000
+
+iso:
+  address: http://192.168.58.15/iso/agent-hub2.iso
